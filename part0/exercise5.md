@@ -17,7 +17,7 @@ sequenceDiagram
 
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/spa.js
     activate server
-    server-->>browser: the JavaScript file
+    server-->>browser: 200, the JavaScript file
     deactivate server
 
     browser->>server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
