@@ -211,8 +211,28 @@ describe('Blog API test with initial dummy database', () => {
       assert.strictEqual(addedBlog.likes, 0)
     })
 
-    test('responds with status code 400 Bad Request if the title and url properties are missing', async () => {
+    test('responds with status code 400 Bad Request if the title property is missing', async () => {
       const newBlog = {
+        author: 'Timothee Chalamet',
+        likes: 14,
+        url: 'www.test.com'
+      }
+
+      const token = await helper.loginRoot()
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .set({ Authorization: `Bearer ${token}` })
+        .expect(400)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, helper.blogs.length)
+    })
+
+    test('responds with status code 400 Bad Request if the url property is missing', async () => {
+      const newBlog = {
+        title: 'Math song',
         author: 'Timothee Chalamet',
         likes: 14
       }
