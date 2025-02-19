@@ -1,0 +1,9 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+Authorization: Bearer token
+{
+  "url": "https://medium.com/datatau/hadoop-with-python-pyspark-a65a6f97ddf2",
+  "title": "Hadoop with Python (I): PySpark",
+  "author": "David Adrián Cañones",
+  "likes": 0
+}

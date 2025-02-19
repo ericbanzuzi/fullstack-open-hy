@@ -1,0 +1,32 @@
+{
+  "name": "part4",
+  "version": "1.0.0",
+  "description": "Part 4 exercises for the fullstack open course at the University of Helsinki",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node index.js",
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "test": "cross-env  NODE_ENV=test node --test",
+    "lint": "eslint .",
+    "start:test": "NODE_ENV=test node index.js"
+  },
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "express-async-errors": "^3.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "@flydotio/dockerfile": "^0.5.0",
+    "@stylistic/eslint-plugin-js": "^1.6.1",
+    "eslint": "^9.17.0",
+    "globals": "^15.14.0",
+    "nodemon": "^3.0.3",
+    "supertest": "^7.0.0"
+  }
+}
