@@ -8,49 +8,51 @@ import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [notification, setNotification] = useState({ message: null, type: "" });
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
+  const [notification, setNotification] = useState({ message: null, type: '' })
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const blogFormRef = useRef()
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )  
+    blogService.getAll().then(blogs => {
+      const sorted = [...blogs].sort((a, b) => b.likes - a.likes)
+      setBlogs( sorted )
+    }
+    )
   }, [])
 
   useEffect(() => {
-      const loggedUserJSON = window.localStorage.getItem('loggedUser')
-      if (loggedUserJSON) {
-        const user = JSON.parse(loggedUserJSON)
-        setUser(user)
-        blogService.setToken(user.token)
-      }
+    const loggedUserJSON = window.localStorage.getItem('loggedUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
+    }
   }, [])
 
   const handleLogin = async (event) => {
-      event.preventDefault()
-      
-      try {
-        const user = await loginService.login({
-          username, password,
-        })
+    event.preventDefault()
 
-        window.localStorage.setItem(
-          'loggedUser', JSON.stringify(user)
-        ) 
-  
-        blogService.setToken(user.token)
-        setUser(user)
-        setUsername('')
-        setPassword('')
-      } catch (exception) {
-        setNotification({ message: "Wrong username or password", type: "error" })
-        setTimeout(() => {
-          setNotification({ message: null, type: "" })
-        }, 5000)
-      }
+    try {
+      const user = await loginService.login({
+        username, password,
+      })
+
+      window.localStorage.setItem(
+        'loggedUser', JSON.stringify(user)
+      )
+
+      blogService.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
+    } catch (exception) {
+      setNotification({ message: 'Wrong username or password', type: 'error' })
+      setTimeout(() => {
+        setNotification({ message: null, type: '' })
+      }, 5000)
+    }
   }
 
   const handleLogout = (event) => {
@@ -63,22 +65,69 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
     blogService
       .create(blogObject)
-        .then(returnedBlog => {
-        setBlogs(blogs.concat(returnedBlog))
-        setNotification({ message: `A new blog "${returnedBlog.title}" by ${returnedBlog.author} added!`, type: "success" })
+      .then(returnedBlog => {
+        blogService.getAll().then(blogs => {
+          const sorted = [...blogs].sort((a, b) => b.likes - a.likes)
+          setBlogs( sorted )
+        })
+        setNotification({ message: `A new blog "${returnedBlog.title}" by ${returnedBlog.author} added!`, type: 'success' })
 
         setTimeout(() => {
-          setNotification({ message: null, type: "" })
+          setNotification({ message: null, type: '' })
         }, 5000)
-  }).catch(() => {
-    setNotification({ message: "Failed to create blog", type: "error" })
+      }).catch(() => {
+        setNotification({ message: 'Failed to create blog', type: 'error' })
 
-    setTimeout(() => {
-      setNotification({ message: null, type: "" })
-    }, 5000)
-  })
-
+        setTimeout(() => {
+          setNotification({ message: null, type: '' })
+        }, 5000)
+      })
   }
+
+  const handleLikes = (id, blogObject) => {
+    blogService
+      .update(id, blogObject)
+      .then(returnedBlog => {
+        setBlogs(prevBlogs => {
+          const updatedBlogs = prevBlogs.map(blog =>
+            blog.id === id ? { ...blog, likes: returnedBlog.likes } : blog
+          )
+          return [...updatedBlogs].sort((a, b) => b.likes - a.likes)
+        })
+      })
+      .catch(() => {
+        setNotification({ message: 'Failed to like blog', type: 'error' })
+
+        setTimeout(() => {
+          setNotification({ message: null, type: '' })
+        }, 5000)
+      })
+  }
+
+  const removeBlog = (id) => {
+    const blogToRemove = blogs.find(blog => blog.id === id)
+    if (window.confirm(`Remove blog "${blogToRemove.title}" by ${blogToRemove.author}?`)) {
+      blogService
+        .remove(id)
+        .then(() => {
+          setBlogs(prevBlogs => prevBlogs.filter(blog => blog.id !== blogToRemove.id))
+
+          setNotification({ message: `Removed blog "${blogToRemove.title}" by ${blogToRemove.author}`, type: 'success' })
+
+          setTimeout(() => {
+            setNotification({ message: null, type: '' })
+          }, 5000)
+        })
+        .catch(() => {
+          setNotification({ message: 'Failed to remove blog', type: 'error' })
+
+          setTimeout(() => {
+            setNotification({ message: null, type: '' })
+          }, 5000)
+        })
+    }
+  }
+
 
   const loginForm = () => (
     <div>
@@ -88,7 +137,7 @@ const App = () => {
       <form onSubmit={handleLogin}>
         <div>
           username
-            <input
+          <input
             type="text"
             value={username}
             name="Username"
@@ -97,7 +146,7 @@ const App = () => {
         </div>
         <div>
           password
-            <input
+          <input
             type="password"
             value={password}
             name="Password"
@@ -105,8 +154,8 @@ const App = () => {
           />
         </div>
         <button type="submit">login</button>
-      </form>    
-    </div>  
+      </form>
+    </div>
   )
 
   const blogForm = () => (
@@ -119,14 +168,14 @@ const App = () => {
     <div>
       <h2>Blogs</h2>
       <Notification message={notification.message} type={notification.type} />
-      
+
       <p>Logged in as {user.name} <button type="button" onClick={handleLogout}>logout</button> </p>
 
       {blogForm()}
 
       <p></p>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} updateBlog={handleLikes} removeBlog={removeBlog}/>
       )}
     </div>
   )

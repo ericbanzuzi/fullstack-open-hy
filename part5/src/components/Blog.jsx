@@ -1,6 +1,7 @@
-import { useState, forwardRef, useImperativeHandle } from 'react'
+import { useState } from 'react'
+import PropTypes from 'prop-types'
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, updateBlog, removeBlog }) => {
 
   const [extended, setExtended] = useState(false)
 
@@ -16,6 +17,26 @@ const Blog = ({ blog }) => {
     setExtended(!extended)
   }
 
+  const blogLike = (event) => {
+    event.preventDefault()
+
+    const updatedBlog = {
+      ...blog,
+      user: blog.user._id,
+      likes: blog.likes + 1
+    }
+
+    updateBlog(blog.id, updatedBlog)
+  }
+
+  const blogRemove = (event) => {
+    event.preventDefault()
+    removeBlog(blog.id)
+  }
+
+  const loggedUserJSON = window.localStorage.getItem('loggedUser')
+  const user = loggedUserJSON ? JSON.parse(loggedUserJSON) : null
+
   const defaultView = () => {
     return (
       <div>
@@ -24,24 +45,34 @@ const Blog = ({ blog }) => {
     )
   }
 
+  console.log(blog)
+
   const extendedView = () => {
     return (
       <div>
-        <div>{blog.title} {blog.author} <button onClick={toggleDetails}> Hide</button> </div>
-        <div>{blog.url} </div>
-        <div>likes {blog.likes} <button> like</button> </div>
-        <div>{blog.user.name} </div>
+        <div> {blog.title} {blog.author} <button onClick={toggleDetails}> Hide</button> </div>
+        <div> {blog.url} </div>
+        <div> likes {blog.likes} <button onClick={blogLike}> like</button> </div>
+        <div> {blog.user.name} </div>
+        {user && user.username === blog.user.username && user.name === blog.user.name ?
+          <div> <button onClick={blogRemove}> remove</button> </div> :
+          null
+        }
       </div>
     )
   }
 
   return (
-  <div style={blogStyle}>
-    {extended?
-        extendedView() :
-        defaultView()
-      }
-  </div>  
-)}
+    <div style={blogStyle}>
+      { extended ? extendedView() : defaultView() }
+    </div>
+  )}
+
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  updateBlog: PropTypes.func.isRequired,
+  removeBlog: PropTypes.func.isRequired
+}
 
 export default Blog

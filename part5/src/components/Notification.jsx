@@ -1,13 +1,20 @@
+import PropTypes from 'prop-types'
+
 const Notification = ({ message, type }) => {
-    if (message === null) {
-      return null
-    }
-  
-    return (
-      <div className={type === "success" ? "success" : "error"}>
-        {message}
-      </div>
-    )
+  if (message === null) {
+    return null
   }
-  
-  export default Notification
+
+  return (
+    <div className={type === 'success' ? 'success' : 'error'}>
+      {message}
+    </div>
+  )
+}
+
+Notification.propTypes = {
+  message: PropTypes.string,
+  type: PropTypes.string
+}
+
+export default Notification
