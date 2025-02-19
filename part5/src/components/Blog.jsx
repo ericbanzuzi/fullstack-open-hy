@@ -39,21 +39,21 @@ const Blog = ({ blog, updateBlog, removeBlog }) => {
 
   const defaultView = () => {
     return (
-      <div>
-        {blog.title} {blog.author} <button onClick={toggleDetails}> View</button>
+      <div className='defaultBlog'>
+        <div className='header'>
+          {blog.title} {blog.author} <button onClick={toggleDetails}> View</button>
+        </div>
       </div>
     )
   }
 
-  console.log(blog)
-
   const extendedView = () => {
     return (
-      <div>
-        <div> {blog.title} {blog.author} <button onClick={toggleDetails}> Hide</button> </div>
-        <div> {blog.url} </div>
-        <div> likes {blog.likes} <button onClick={blogLike}> like</button> </div>
-        <div> {blog.user.name} </div>
+      <div className='extendedBlog'>
+        <div className='header'> {blog.title} {blog.author} <button onClick={toggleDetails}> Hide</button> </div>
+        <div className='url'> {blog.url} </div>
+        <div className='likes'> likes {blog.likes} <button onClick={blogLike}> like</button> </div>
+        <div className='user'> {blog.user.name} </div>
         {user && user.username === blog.user.username && user.name === blog.user.name ?
           <div> <button onClick={blogRemove}> remove</button> </div> :
           null
@@ -69,10 +69,10 @@ const Blog = ({ blog, updateBlog, removeBlog }) => {
   )}
 
 
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  updateBlog: PropTypes.func.isRequired,
-  removeBlog: PropTypes.func.isRequired
-}
+// Blog.propTypes = {
+//   blog: PropTypes.object.isRequired,
+//   updateBlog: PropTypes.func.isRequired,
+//   removeBlog: PropTypes.func.isRequired
+// }
 
 export default Blog
